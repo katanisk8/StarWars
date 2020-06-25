@@ -26,10 +26,7 @@ namespace CodePepper.WebUi
         {
             services.AddControllers();
 
-            services
-                .AddDbContextPool<AppDbContext>(options =>
-                    options.UseSqlServer(Configuration.GetConnectionString("AppDbContext"))
-                );
+            services.AddDbContext<AppDbContext>(x => x.UseSqlite("Data Source=StarWarsDatabase.db"));
 
             services.AddSwagger();
         }
@@ -45,7 +42,7 @@ namespace CodePepper.WebUi
             builder.RegisterAssemblyTypes(assemblies).AsImplementedInterfaces().AsSelf();
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, AppDbContext dbContext)
         {
             if (env.IsDevelopment())
             {
@@ -64,6 +61,8 @@ namespace CodePepper.WebUi
             {
                 endpoints.MapControllers();
             });
+
+            dbContext.Database.Migrate();
         }
     }
 }
